@@ -20,12 +20,14 @@ go get github.com/marcgeld/ruuvi
 
 ## Supported Formats
 
-| Format | Name | Status | Description |
-|--------|------|--------|-------------|
-| 2 | URL | Obsolete | URL-based format used on Kickstarter devices |
-| 3 | RAWv1 | Deprecated | Primary format in 1.x and 2.x firmware (widely deployed) |
-| 4 | URL with ID | Obsolete | URL-based format used before June 2018 |
-| 5 | RAWv2 | **In Production** | Primary format in 2.x and 3.x firmware |
+| Format | Name | Status | Decoding | Encoding |
+|--------|------|--------|----------|----------|
+| 2 | URL | Obsolete | ✓ | ✗ |
+| 3 | RAWv1 | Deprecated | ✓ | ✗ |
+| 4 | URL with ID | Obsolete | ✓ | ✗ |
+| 5 | RAWv2 | **In Production** | ✓ | ✓ (Experimental) |
+
+**Note**: Encoding support is experimental and currently limited to Format 5 only.
 
 ## Quick Start
 
@@ -135,9 +137,13 @@ if data.Temperature != nil {
 }
 ```
 
-### Encoding Data
+## Encoding Data
 
-You can also encode sensor data back to raw bytes:
+> **⚠️ EXPERIMENTAL**: Encoding support is currently experimental and limited to Data Format 5 (RAWv2) only. The API may change in future versions. Encoding is not supported for Formats 2, 3, or 4.
+
+### Format 5 Encoding
+
+You can encode sensor data into Format 5 (RAWv2) raw bytes:
 
 ```go
 import "github.com/marcgeld/ruuvi/tag"
@@ -153,12 +159,33 @@ data := &tag.Format5Data{
     // Other fields...
 }
 
+// Encode to payload (24 bytes: format ID + data)
 raw, err := tag.EncodeFormat5(data)
 if err != nil {
     // Handle error
 }
-// raw is now a 24-byte slice ready for BLE advertisement
+// raw is now a 24-byte slice starting with 0x05
+
+// Or encode with manufacturer data prefix (26 bytes: 0x9904 + payload)
+manufacturerData, err := tag.EncodeFormat5ManufacturerData(data)
+if err != nil {
+    // Handle error
+}
+// manufacturerData can be used directly in BLE manufacturer data advertisement
 ```
+
+**Important Notes:**
+
+- **Quantization**: Due to fixed-point encoding, values are quantized to the resolution defined in the Format 5 specification. Decoding encoded data may not produce exactly the same values as the input (within resolution limits).
+- **Resolution limits**:
+  - Temperature: 0.005°C
+  - Humidity: 0.0025%
+  - Pressure: 1 Pa
+  - Acceleration: 0.001 G (1 mG)
+  - Battery Voltage: 1 mV
+  - TX Power: 2 dBm
+- **Missing fields**: Fields that are `nil` are encoded using "not available" sentinel values as defined in the Ruuvi specification.
+- **Manufacturer data**: The manufacturer ID `0x9904` (Ruuvi Innovations Ltd.) is prepended in little-endian format as per Bluetooth specification.
 
 ## Data Formats
 

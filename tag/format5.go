@@ -143,9 +143,35 @@ func DecodeFormat5(data []byte) (*Format5Data, error) {
 	return result, nil
 }
 
-// EncodeFormat5 encodes Format5Data into raw bytes suitable for BLE advertisement.
-// Returns exactly 24 bytes: 1 byte format ID + 23 bytes data.
-// Invalid/nil fields are encoded using their respective invalid values.
+// EncodeFormat5 encodes Format5Data into raw bytes suitable for BLE advertisement payload.
+//
+// This function is EXPERIMENTAL and part of the Data Format 5 (RAWv2) encoding support.
+// The API may change in future versions.
+//
+// Returns exactly 24 bytes: 1 byte format ID (0x05) + 23 bytes data payload.
+//
+// Fields that are nil or NaN are encoded using the appropriate "not available" sentinel
+// values as defined in the Ruuvi Data Format 5 specification:
+//   - Temperature: 0x8000 (-32768)
+//   - Humidity: 0xFFFF (65535)
+//   - Pressure: 0xFFFF (65535)
+//   - Acceleration X/Y/Z: 0x8000 (-32768)
+//   - Battery Voltage: 0x7FF (2047, in the 11-bit field)
+//   - TX Power: 0x1F (31, in the 5-bit field)
+//   - Movement Counter: 0xFF (255)
+//   - Measurement Sequence: 0xFFFF (65535)
+//   - MAC Address: all 0xFF bytes
+//
+// Values are quantized according to the Data Format 5 specification:
+//   - Temperature: 0.005°C resolution
+//   - Humidity: 0.0025% resolution
+//   - Pressure: 1 Pa resolution
+//   - Acceleration: 0.001 G (1 mG) resolution
+//   - Battery Voltage: 1 mV resolution
+//   - TX Power: 2 dBm resolution
+//
+// Note: Due to quantization, decoding the encoded data may not produce exactly the same
+// values as the input (within the resolution limits of each field).
 func EncodeFormat5(data *Format5Data) ([]byte, error) {
 	if data == nil {
 		return nil, errors.New("data cannot be nil")
@@ -243,6 +269,34 @@ func EncodeFormat5(data *Format5Data) ([]byte, error) {
 	} else {
 		copy(result[18:24], (*data.MACAddress)[:])
 	}
+
+	return result, nil
+}
+
+// EncodeFormat5ManufacturerData encodes Format5Data into manufacturer-specific data
+// suitable for BLE advertisement manufacturer data field.
+//
+// This function is EXPERIMENTAL and part of the Data Format 5 (RAWv2) encoding support.
+// The API may change in future versions.
+//
+// Returns exactly 26 bytes: 2 bytes manufacturer ID (0x9904, Ruuvi Innovations Ltd.)
+// + 24 bytes Format 5 payload (format ID + data).
+//
+// The manufacturer ID bytes are in little-endian order as per Bluetooth specification.
+// The returned data can be used directly in a BLE manufacturer data advertisement.
+//
+// For details on field encoding and sentinel values, see EncodeFormat5.
+func EncodeFormat5ManufacturerData(data *Format5Data) ([]byte, error) {
+	payload, err := EncodeFormat5(data)
+	if err != nil {
+		return nil, err
+	}
+
+	// Prepend manufacturer ID: 0x0499 (Ruuvi Innovations Ltd.) in little-endian
+	result := make([]byte, 26)
+	result[0] = 0x99
+	result[1] = 0x04
+	copy(result[2:], payload)
 
 	return result, nil
 }

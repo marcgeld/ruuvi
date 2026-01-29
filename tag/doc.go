@@ -47,7 +47,19 @@
 // sensor data including MAC address, movement counter, and measurement sequence for
 // deduplication.
 //
+// # Encoding Support (Experimental)
+//
+// Encoding support is currently EXPERIMENTAL and limited to Data Format 5 (RAWv2) only.
+// The API may change in future versions. Encoding is not supported for Formats 2, 3, or 4.
+//
+// The encoding functions follow the official Ruuvi Data Format 5 specification for
+// scaling, rounding, and sentinel values. Fields that are nil in the input data are
+// encoded using the appropriate "not available" sentinel values as defined in the spec.
+//
+// See EncodeFormat5 and EncodeFormat5ManufacturerData for details.
+//
 // # References
 //
 // Official specifications: https://github.com/ruuvi/ruuvi-sensor-protocols
+// Format 5 specification: https://github.com/ruuvi/ruuvi-sensor-protocols/blob/master/dataformat_05.md
 package tag
