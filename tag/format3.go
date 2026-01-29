@@ -11,13 +11,13 @@ import (
 // This format was the primary format in 1.x and 2.x firmware.
 // It is deprecated but still in use on many deployed RuuviTags.
 type Format3Data struct {
-	Temperature   *float64 // Temperature in degrees Celsius
-	Humidity      *float64 // Relative humidity in percent
-	Pressure      *int     // Atmospheric pressure in Pascals
-	AccelerationX *float64 // Acceleration X-axis in G
-	AccelerationY *float64 // Acceleration Y-axis in G
-	AccelerationZ *float64 // Acceleration Z-axis in G
-	BatteryVoltage *int    // Battery voltage in millivolts
+	Temperature    *float64 // Temperature in degrees Celsius
+	Humidity       *float64 // Relative humidity in percent
+	Pressure       *int     // Atmospheric pressure in Pascals
+	AccelerationX  *float64 // Acceleration X-axis in G
+	AccelerationY  *float64 // Acceleration Y-axis in G
+	AccelerationZ  *float64 // Acceleration Z-axis in G
+	BatteryVoltage *int     // Battery voltage in millivolts
 }
 
 // DecodeFormat3 decodes RuuviTag Data Format 3 (RAWv1) from raw bytes.

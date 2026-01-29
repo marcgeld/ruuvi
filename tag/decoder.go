@@ -29,7 +29,7 @@ func DetectFormat(data []byte) (DataFormat, error) {
 	}
 
 	format := DataFormat(data[0])
-	
+
 	switch format {
 	case Format2, Format3, Format4, Format5:
 		return format, nil

@@ -13,17 +13,17 @@ import (
 // Format5Data represents decoded RuuviTag Data Format 5 (RAWv2) sensor data.
 // This is the primary format in 2.x and 3.x firmware, in production since January 2019.
 type Format5Data struct {
-	Temperature         *float64              // Temperature in degrees Celsius
-	Humidity            *float64              // Relative humidity in percent
-	Pressure            *int                  // Atmospheric pressure in Pascals
-	AccelerationX       *float64              // Acceleration X-axis in G
-	AccelerationY       *float64              // Acceleration Y-axis in G
-	AccelerationZ       *float64              // Acceleration Z-axis in G
-	BatteryVoltage      *int                  // Battery voltage in millivolts
-	TxPower             *int                  // TX power in dBm
-	MovementCounter     *uint8                // Movement counter (0-254)
-	MeasurementSequence *uint16               // Measurement sequence number (0-65534)
-	MACAddress          *common.MACAddress    // 48-bit MAC address
+	Temperature         *float64           // Temperature in degrees Celsius
+	Humidity            *float64           // Relative humidity in percent
+	Pressure            *int               // Atmospheric pressure in Pascals
+	AccelerationX       *float64           // Acceleration X-axis in G
+	AccelerationY       *float64           // Acceleration Y-axis in G
+	AccelerationZ       *float64           // Acceleration Z-axis in G
+	BatteryVoltage      *int               // Battery voltage in millivolts
+	TxPower             *int               // TX power in dBm
+	MovementCounter     *uint8             // Movement counter (0-254)
+	MeasurementSequence *uint16            // Measurement sequence number (0-65534)
+	MACAddress          *common.MACAddress // 48-bit MAC address
 }
 
 // DecodeFormat5 decodes RuuviTag Data Format 5 (RAWv2) from raw bytes.
@@ -96,7 +96,7 @@ func DecodeFormat5(data []byte) (*Format5Data, error) {
 
 	// Power info: bytes 13-14, 11 bits voltage + 5 bits TX power
 	powerInfo := binary.BigEndian.Uint16(data[13:15])
-	
+
 	// Battery voltage: first 11 bits, offset by 1600 mV
 	battRaw := powerInfo >> 5
 	if battRaw == 0x7FF { // 2047 = invalid
