@@ -2,7 +2,6 @@ package tag
 
 import (
 	"encoding/hex"
-	"math"
 	"testing"
 
 	"github.com/marcgeld/ruuvi/common"
@@ -408,7 +407,3 @@ func TestEncodeFormat5_RoundTrip(t *testing.T) {
 	}
 }
 
-// floatEquals compares two float64 values within a tolerance.
-func floatEquals(a, b, tolerance float64) bool {
-	return math.Abs(a-b) <= tolerance
-}

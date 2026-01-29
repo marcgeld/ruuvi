@@ -69,31 +69,21 @@ func DecodeFormat3(data []byte) (*Format3Data, error) {
 	}
 
 	// Acceleration X: bytes 6-7, signed 16-bit in mG
+	// Format 3 spec: "There is no specific value for invalid/not available sensor readings"
+	// All values should be treated as valid (0 is a legitimate reading)
 	accXRaw := int16(binary.BigEndian.Uint16(data[6:8]))
-	if accXRaw == 0 {
-		result.AccelerationX = nil
-	} else {
-		accX := float64(accXRaw) / 1000.0 // Convert mG to G
-		result.AccelerationX = &accX
-	}
+	accX := float64(accXRaw) / 1000.0 // Convert mG to G
+	result.AccelerationX = &accX
 
 	// Acceleration Y: bytes 8-9, signed 16-bit in mG
 	accYRaw := int16(binary.BigEndian.Uint16(data[8:10]))
-	if accYRaw == 0 {
-		result.AccelerationY = nil
-	} else {
-		accY := float64(accYRaw) / 1000.0 // Convert mG to G
-		result.AccelerationY = &accY
-	}
+	accY := float64(accYRaw) / 1000.0 // Convert mG to G
+	result.AccelerationY = &accY
 
 	// Acceleration Z: bytes 10-11, signed 16-bit in mG
 	accZRaw := int16(binary.BigEndian.Uint16(data[10:12]))
-	if accZRaw == 0 {
-		result.AccelerationZ = nil
-	} else {
-		accZ := float64(accZRaw) / 1000.0 // Convert mG to G
-		result.AccelerationZ = &accZ
-	}
+	accZ := float64(accZRaw) / 1000.0 // Convert mG to G
+	result.AccelerationZ = &accZ
 
 	// Battery voltage: bytes 12-13, unsigned 16-bit in mV
 	battRaw := binary.BigEndian.Uint16(data[12:14])
@@ -158,7 +148,7 @@ func EncodeFormat3(data *Format3Data) ([]byte, error) {
 
 	// Acceleration X
 	if data.AccelerationX == nil || math.IsNaN(*data.AccelerationX) {
-		binary.BigEndian.PutUint16(result[6:8], 0)
+		binary.BigEndian.PutUint16(result[6:8], 0) // Use 0 for unavailable per spec
 	} else {
 		accX := int16(*data.AccelerationX * 1000)
 		binary.BigEndian.PutUint16(result[6:8], uint16(accX))
@@ -166,7 +156,7 @@ func EncodeFormat3(data *Format3Data) ([]byte, error) {
 
 	// Acceleration Y
 	if data.AccelerationY == nil || math.IsNaN(*data.AccelerationY) {
-		binary.BigEndian.PutUint16(result[8:10], 0)
+		binary.BigEndian.PutUint16(result[8:10], 0) // Use 0 for unavailable per spec
 	} else {
 		accY := int16(*data.AccelerationY * 1000)
 		binary.BigEndian.PutUint16(result[8:10], uint16(accY))
@@ -174,7 +164,7 @@ func EncodeFormat3(data *Format3Data) ([]byte, error) {
 
 	// Acceleration Z
 	if data.AccelerationZ == nil || math.IsNaN(*data.AccelerationZ) {
-		binary.BigEndian.PutUint16(result[10:12], 0)
+		binary.BigEndian.PutUint16(result[10:12], 0) // Use 0 for unavailable per spec
 	} else {
 		accZ := int16(*data.AccelerationZ * 1000)
 		binary.BigEndian.PutUint16(result[10:12], uint16(accZ))
