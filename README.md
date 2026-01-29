@@ -222,12 +222,40 @@ ruuvi/
     └── format5.go   # Format 5 (RAWv2, production)
 ```
 
-## Testing
+### Building
 
-The package includes comprehensive tests based on official Ruuvi test vectors:
+Build the application:
+
+```bash
+go build ./cmd/ruuvi
+```
+
+### Testing
+
+Run all tests:
 
 ```bash
 go test ./...
+```
+
+Run tests with verbose output:
+
+```bash
+go test -v ./...
+```
+
+Run tests with coverage:
+
+```bash
+go test -cover ./...
+```
+
+Run tests for a specific package:
+
+```bash
+go test -v ./tag/
+go test -v ./tag/
+go test -v ./common/
 ```
 
 ## References
