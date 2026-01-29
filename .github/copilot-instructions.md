@@ -137,11 +137,21 @@ if err != nil {
 ```
 
 ### Invalid Value Handling
-- Use specific invalid values per protocol specification
+
+**Format 5 (RAWv2) Invalid Values:**
 - Temperature: 0x8000 (-32768)
 - Humidity: 0xFFFF (65535)
 - Pressure: 0xFFFF (65535)
+- Acceleration: 0x8000 (-32768)
+- Battery Voltage: 0x7FF (2047) in the 11-bit field
+- TX Power: 0x1F (31) in the 5-bit field
+- Movement Counter: 0xFF (255)
+- Measurement Sequence: 0xFFFF (65535)
 - MAC Address: all bytes 0xFF
+
+**Format 3 (RAWv1):** Check format3.go for specific invalid value handling
+
+Always set fields to nil when invalid values are encountered.
 
 ## References
 
