@@ -44,7 +44,7 @@ func ParseManufacturerData(data []byte) (*Measurement, error) {
 // - Byte 0: Format (5)
 // - Bytes 1-2: Temperature in 0.005 degrees
 // - Bytes 3-4: Humidity in 0.0025%
-// - Bytes 5-6: Pressure in 1 Pa with -50000 Pa offset
+// - Bytes 5-6: Pressure in 1 Pa units, add 50000 Pa offset
 // - Bytes 7-8: Acceleration X in mG
 // - Bytes 9-10: Acceleration Y in mG
 // - Bytes 11-12: Acceleration Z in mG
@@ -73,7 +73,7 @@ func parseFormat5(data []byte) (*Measurement, error) {
 		m.Humidity = &humidity
 	}
 
-	// Pressure: bytes 5-6, unsigned int16, 1 Pa resolution, offset -50000 Pa
+	// Pressure: bytes 5-6, unsigned int16, 1 Pa resolution, add 50000 Pa offset
 	pressureRaw := binary.BigEndian.Uint16(data[5:7])
 	if pressureRaw != 0xFFFF { // 65535 is invalid
 		pressure := uint32(pressureRaw) + 50000
