@@ -2,6 +2,7 @@ package tag
 
 import (
 	"encoding/hex"
+	"strings"
 	"testing"
 
 	"github.com/marcgeld/ruuvi/common"
@@ -405,5 +406,237 @@ func TestEncodeFormat5_RoundTrip(t *testing.T) {
 			}
 		})
 	}
+}
+
+// TestEncodeFormat5_FullyPopulated tests encoding with all fields populated.
+func TestEncodeFormat5_FullyPopulated(t *testing.T) {
+	temp := 24.3
+	hum := 53.49
+	pressure := 100044
+	accX := 0.004
+	accY := -0.004
+	accZ := 1.036
+	batt := 2977
+	tx := 4
+	movement := uint8(66)
+	sequence := uint16(205)
+	mac := common.MACAddress{0xCB, 0xB8, 0x33, 0x4C, 0x88, 0x4F}
+
+	data := &Format5Data{
+		Temperature:         &temp,
+		Humidity:            &hum,
+		Pressure:            &pressure,
+		AccelerationX:       &accX,
+		AccelerationY:       &accY,
+		AccelerationZ:       &accZ,
+		BatteryVoltage:      &batt,
+		TxPower:             &tx,
+		MovementCounter:     &movement,
+		MeasurementSequence: &sequence,
+		MACAddress:          &mac,
+	}
+
+	encoded, err := EncodeFormat5(data)
+	if err != nil {
+		t.Fatalf("EncodeFormat5 failed: %v", err)
+	}
+
+	// Should match the official test vector
+	expected := "0512FC5394C37C0004FFFC040CAC364200CDCBB8334C884F"
+	if hex.EncodeToString(encoded) != strings.ToLower(expected) {
+		t.Errorf("Encoded data mismatch:\ngot  %s\nwant %s", hex.EncodeToString(encoded), strings.ToLower(expected))
+	}
+
+	// Round trip test
+	decoded, err := DecodeFormat5(encoded)
+	if err != nil {
+		t.Fatalf("DecodeFormat5 failed: %v", err)
+	}
+
+	// Verify all fields match (within quantization tolerance)
+	if decoded.Temperature == nil || !floatEquals(*decoded.Temperature, temp, 0.005) {
+		t.Errorf("Temperature = %v, want %v", decoded.Temperature, temp)
+	}
+	if decoded.Humidity == nil || !floatEquals(*decoded.Humidity, hum, 0.01) {
+		t.Errorf("Humidity = %v, want %v", decoded.Humidity, hum)
+	}
+	if decoded.Pressure == nil || *decoded.Pressure != pressure {
+		t.Errorf("Pressure = %v, want %v", decoded.Pressure, pressure)
+	}
+}
+
+// TestEncodeFormat5_MissingFields tests encoding with some fields missing (nil).
+func TestEncodeFormat5_MissingFields(t *testing.T) {
+	// Only populate some fields
+	temp := 20.5
+	pressure := 101325
+
+	data := &Format5Data{
+		Temperature: &temp,
+		Pressure:    &pressure,
+		// Other fields are nil
+	}
+
+	encoded, err := EncodeFormat5(data)
+	if err != nil {
+		t.Fatalf("EncodeFormat5 failed: %v", err)
+	}
+
+	if len(encoded) != 24 {
+		t.Errorf("Encoded length = %d, want 24", len(encoded))
+	}
+
+	// Decode and verify
+	decoded, err := DecodeFormat5(encoded)
+	if err != nil {
+		t.Fatalf("DecodeFormat5 failed: %v", err)
+	}
+
+	// Check that populated fields are preserved
+	if decoded.Temperature == nil {
+		t.Error("Temperature should not be nil")
+	} else if !floatEquals(*decoded.Temperature, temp, 0.005) {
+		t.Errorf("Temperature = %v, want %v", *decoded.Temperature, temp)
+	}
+
+	if decoded.Pressure == nil {
+		t.Error("Pressure should not be nil")
+	} else if *decoded.Pressure != pressure {
+		t.Errorf("Pressure = %v, want %v", *decoded.Pressure, pressure)
+	}
+
+	// Check that nil fields are properly encoded as invalid/unavailable
+	if decoded.Humidity != nil {
+		t.Errorf("Humidity should be nil, got %v", *decoded.Humidity)
+	}
+	if decoded.AccelerationX != nil {
+		t.Errorf("AccelerationX should be nil, got %v", *decoded.AccelerationX)
+	}
+	if decoded.BatteryVoltage != nil {
+		t.Errorf("BatteryVoltage should be nil, got %v", *decoded.BatteryVoltage)
+	}
+	if decoded.TxPower != nil {
+		t.Errorf("TxPower should be nil, got %v", *decoded.TxPower)
+	}
+	if decoded.MovementCounter != nil {
+		t.Errorf("MovementCounter should be nil, got %v", *decoded.MovementCounter)
+	}
+	if decoded.MeasurementSequence != nil {
+		t.Errorf("MeasurementSequence should be nil, got %v", *decoded.MeasurementSequence)
+	}
+	if decoded.MACAddress != nil {
+		t.Errorf("MACAddress should be nil, got %v", decoded.MACAddress)
+	}
+}
+
+// TestEncodeFormat5ManufacturerData tests encoding with manufacturer data prefix.
+func TestEncodeFormat5ManufacturerData(t *testing.T) {
+	temp := 24.3
+	hum := 53.49
+	pressure := 100044
+	mac := common.MACAddress{0xCB, 0xB8, 0x33, 0x4C, 0x88, 0x4F}
+
+	data := &Format5Data{
+		Temperature: &temp,
+		Humidity:    &hum,
+		Pressure:    &pressure,
+		MACAddress:  &mac,
+	}
+
+	encoded, err := EncodeFormat5ManufacturerData(data)
+	if err != nil {
+		t.Fatalf("EncodeFormat5ManufacturerData failed: %v", err)
+	}
+
+	// Should be 26 bytes: 2 manufacturer ID + 24 payload
+	if len(encoded) != 26 {
+		t.Errorf("Encoded length = %d, want 26", len(encoded))
+	}
+
+	// Check manufacturer ID (little-endian: 0x0499 -> 0x99 0x04)
+	if encoded[0] != 0x99 || encoded[1] != 0x04 {
+		t.Errorf("Manufacturer ID = %02X%02X, want 9904", encoded[0], encoded[1])
+	}
+
+	// Check format byte
+	if encoded[2] != 0x05 {
+		t.Errorf("Format byte = %02X, want 05", encoded[2])
+	}
+
+	// Verify the payload matches EncodeFormat5 output
+	payload, err := EncodeFormat5(data)
+	if err != nil {
+		t.Fatalf("EncodeFormat5 failed: %v", err)
+	}
+
+	if !bytesEqual(encoded[2:], payload) {
+		t.Error("Manufacturer data payload does not match EncodeFormat5 output")
+	}
+}
+
+// TestEncodeFormat5ManufacturerData_RoundTrip tests that manufacturer data
+// can be decoded using ParseManufacturerData (if implemented).
+func TestEncodeFormat5ManufacturerData_RoundTrip(t *testing.T) {
+	temp := 20.0
+	hum := 50.0
+	pressure := 100000
+
+	data := &Format5Data{
+		Temperature: &temp,
+		Humidity:    &hum,
+		Pressure:    &pressure,
+	}
+
+	encoded, err := EncodeFormat5ManufacturerData(data)
+	if err != nil {
+		t.Fatalf("EncodeFormat5ManufacturerData failed: %v", err)
+	}
+
+	// Remove manufacturer ID prefix and decode the payload
+	payload := encoded[2:]
+	decoded, err := DecodeFormat5(payload)
+	if err != nil {
+		t.Fatalf("DecodeFormat5 failed: %v", err)
+	}
+
+	// Verify fields (within quantization tolerance)
+	if decoded.Temperature == nil || !floatEquals(*decoded.Temperature, temp, 0.01) {
+		t.Errorf("Temperature = %v, want %v", decoded.Temperature, temp)
+	}
+	if decoded.Humidity == nil || !floatEquals(*decoded.Humidity, hum, 0.01) {
+		t.Errorf("Humidity = %v, want %v", decoded.Humidity, hum)
+	}
+	if decoded.Pressure == nil || *decoded.Pressure != pressure {
+		t.Errorf("Pressure = %v, want %v", decoded.Pressure, pressure)
+	}
+}
+
+// TestEncodeFormat5_NilData tests error handling for nil input.
+func TestEncodeFormat5_NilData(t *testing.T) {
+	_, err := EncodeFormat5(nil)
+	if err == nil {
+		t.Error("EncodeFormat5 should return error for nil data")
+	}
+}
+
+// TestEncodeFormat5ManufacturerData_NilData tests error handling for nil input.
+func TestEncodeFormat5ManufacturerData_NilData(t *testing.T) {
+	_, err := EncodeFormat5ManufacturerData(nil)
+	if err == nil {
+		t.Error("EncodeFormat5ManufacturerData should return error for nil data")
+	}
+}
+
+// bytesEqual compares two byte slices for equality.
+func bytesEqual(a, b []byte) bool {
+	if len(a) != len(b) {
+		return false
+	}
+	for i := range a {
+		if a[i] != b[i] {
+			return false
+		}
+	}
+	return true
 }
 
