@@ -22,6 +22,7 @@ Please be respectful and professional in all interactions. We are committed to p
 - Go 1.21 or later
 - Git
 - golangci-lint (for linting)
+- goimports (for code formatting) - Install with: `go install golang.org/x/tools/cmd/goimports@latest`
 
 ### Setting Up Your Development Environment
 

@@ -32,6 +32,7 @@ tidy:
 # Format code
 fmt:
 	go fmt ./...
+	@command -v goimports >/dev/null 2>&1 || { echo "goimports not found. Install with: go install golang.org/x/tools/cmd/goimports@latest"; exit 1; }
 	goimports -w -local github.com/marcgeld/ruuvi .
 
 # Run go vet
@@ -42,6 +43,7 @@ vet:
 clean:
 	rm -f ruuvi
 	rm -f cmd/ruuvi/ruuvi
+	rm -f cmd/ruuvi/ruuvi.exe
 	rm -f coverage.txt
 	rm -rf dist/
 

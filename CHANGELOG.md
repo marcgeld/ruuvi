@@ -11,6 +11,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - GitHub Actions CI workflow for automated testing and linting
 - GitHub Actions release workflow for creating tagged releases
 - Cross-platform binary builds for the CLI tool
+- CONTRIBUTING.md with comprehensive contribution guidelines
+- Makefile with common development commands (test, lint, build, tidy, fmt, vet, clean, install)
+- Updated .gitignore for build artifacts and dist directory
+- Enhanced README.md with versioning, release process, and development sections
 
 ## Release Notes
 
@@ -27,5 +31,3 @@ This project uses [Semantic Versioning](https://semver.org/):
 **Before v1.0.0**: Breaking changes may occur but should still bump the minor version (v0.x.y).
 
 **After v1.0.0**: Breaking changes will bump the major version.
-
-[Unreleased]: https://github.com/marcgeld/ruuvi/compare/v0.1.0...HEAD
