@@ -10,6 +10,10 @@
 
 # Built CLI binaries
 /cmd/ruuvi/ruuvi
+/ruuvi
+
+# Build artifacts and release binaries
+dist/
 
 # Test binary, built with `go test -c`
 *.test

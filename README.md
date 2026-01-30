@@ -14,9 +14,38 @@ The code emphasizes:
 
 ## Installation
 
+### As a Go Module Dependency
+
+To use this module in your Go project, add it as a dependency:
+
 ```bash
+# Install the latest version
 go get github.com/marcgeld/ruuvi
+
+# Install a specific version
+go get github.com/marcgeld/ruuvi@v0.1.0
 ```
+
+In your `go.mod`:
+```go
+require github.com/marcgeld/ruuvi v0.1.0
+```
+
+### Installing the CLI Tool
+
+Install the `ruuvi` CLI tool globally:
+
+```bash
+go install github.com/marcgeld/ruuvi/cmd/ruuvi@latest
+```
+
+Or install a specific version:
+
+```bash
+go install github.com/marcgeld/ruuvi/cmd/ruuvi@v0.1.0
+```
+
+Alternatively, download pre-built binaries from the [releases page](https://github.com/marcgeld/ruuvi/releases).
 
 ## Supported Formats
 
@@ -256,6 +285,82 @@ Run tests for a specific package:
 go test -v ./tag/
 go test -v ./tag/
 go test -v ./common/
+```
+
+## Development
+
+This project includes a Makefile with common development tasks:
+
+```bash
+# Run tests with race detection
+make test
+
+# Run linters
+make lint
+
+# Build all packages and CLI
+make build
+
+# Format code
+make fmt
+
+# Run go vet
+make vet
+
+# Run go mod tidy
+make tidy
+
+# Install CLI tool
+make install
+```
+
+For more details on contributing, see [CONTRIBUTING.md](CONTRIBUTING.md).
+
+## Versioning
+
+This project follows [Semantic Versioning](https://semver.org/):
+
+- **MAJOR** version (v1.0.0, v2.0.0, etc.) - Incompatible API changes
+- **MINOR** version (v1.1.0, v1.2.0, etc.) - New functionality, backward compatible
+- **PATCH** version (v1.0.1, v1.0.2, etc.) - Backward compatible bug fixes
+
+**Pre-v1.0.0**: Breaking changes may occur but should bump the minor version (v0.x.y).
+
+**Post-v1.0.0**: Breaking changes will bump the major version.
+
+### Version History
+
+See the [releases page](https://github.com/marcgeld/ruuvi/releases) for detailed release notes and the [CHANGELOG.md](CHANGELOG.md) for a summary of changes.
+
+## Release Process
+
+This project uses automated releases via GitHub Actions.
+
+### Creating a Release
+
+1. Ensure all changes are committed and pushed to `main`
+2. Tag the release using semantic versioning:
+   ```bash
+   git tag v0.1.0
+   git push origin v0.1.0
+   ```
+3. The GitHub Actions release workflow will automatically:
+   - Run tests
+   - Build cross-platform CLI binaries (Linux, macOS, Windows for amd64 and arm64)
+   - Generate checksums for all binaries
+   - Create a GitHub Release with auto-generated release notes
+   - Attach binaries and checksums as release assets
+
+### Using Released Versions
+
+**For Go modules**: Reference the version in your `go.mod`:
+```go
+require github.com/marcgeld/ruuvi v0.1.0
+```
+
+**For CLI users**: Download pre-built binaries from the [releases page](https://github.com/marcgeld/ruuvi/releases) or install via:
+```bash
+go install github.com/marcgeld/ruuvi/cmd/ruuvi@v0.1.0
 ```
 
 ## References
