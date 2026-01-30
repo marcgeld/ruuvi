@@ -14,7 +14,7 @@ help:
 
 # Run tests with race detection and coverage
 test:
-	go test -v -race -coverprofile=coverage.txt -covermode=atomic ./...
+	go test -v -race -coverprofile=coverage.txt -covermode=atomic $$(go list ./... | grep -v /examples/)
 
 # Run golangci-lint
 lint:
