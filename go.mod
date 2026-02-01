@@ -1,3 +1,3 @@
-module github.com/marcgeld/ruuvi
+module github.com/marcgeld/hermod
 
-go 1.25
+go 1.24

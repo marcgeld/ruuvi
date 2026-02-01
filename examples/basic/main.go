@@ -7,7 +7,7 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/marcgeld/ruuvi/tag"
+	"github.com/marcgeld/hermod/tag"
 )
 
 func main() {

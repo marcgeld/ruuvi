@@ -20,15 +20,15 @@ To use this module in your Go project, add it as a dependency:
 
 ```bash
 # Install the latest version
-go get github.com/marcgeld/ruuvi
+go get github.com/marcgeld/hermod
 
 # Install a specific version
-go get github.com/marcgeld/ruuvi@v0.1.0
+go get github.com/marcgeld/hermod@v0.1.0
 ```
 
 In your `go.mod`:
 ```go
-require github.com/marcgeld/ruuvi v0.1.0
+require github.com/marcgeld/hermod v0.1.0
 ```
 
 ### Installing the CLI Tool
@@ -36,13 +36,13 @@ require github.com/marcgeld/ruuvi v0.1.0
 Install the `ruuvi` CLI tool globally:
 
 ```bash
-go install github.com/marcgeld/ruuvi/cmd/ruuvi@latest
+go install github.com/marcgeld/hermod/cmd/ruuvi@latest
 ```
 
 Or install a specific version:
 
 ```bash
-go install github.com/marcgeld/ruuvi/cmd/ruuvi@v0.1.0
+go install github.com/marcgeld/hermod/cmd/ruuvi@v0.1.0
 ```
 
 Alternatively, download pre-built binaries from the [releases page](https://github.com/marcgeld/ruuvi/releases).
@@ -66,7 +66,7 @@ package main
 import (
     "encoding/hex"
     "fmt"
-    "github.com/marcgeld/ruuvi/tag"
+    "github.com/marcgeld/hermod/tag"
 )
 
 func main() {
@@ -101,7 +101,7 @@ func main() {
 The `Decode` function automatically detects and decodes any supported format:
 
 ```go
-import "github.com/marcgeld/ruuvi/tag"
+import "github.com/marcgeld/hermod/tag"
 
 raw := []byte{0x05, /* ... */}
 decoded, err := tag.Decode(raw)
@@ -126,7 +126,7 @@ case tag.Format3:
 Format 5 is the current production format with the most comprehensive sensor data:
 
 ```go
-import "github.com/marcgeld/ruuvi/tag"
+import "github.com/marcgeld/hermod/tag"
 
 raw := []byte{0x05, /* 23 more bytes */}
 data, err := tag.DecodeFormat5(raw)
@@ -152,7 +152,7 @@ if data.MovementCounter != nil {
 #### Format 3 (RAWv1) - Deprecated but Widely Used
 
 ```go
-import "github.com/marcgeld/ruuvi/tag"
+import "github.com/marcgeld/hermod/tag"
 
 raw := []byte{0x03, /* 13 more bytes */}
 data, err := tag.DecodeFormat3(raw)
@@ -175,7 +175,7 @@ if data.Temperature != nil {
 You can encode sensor data into Format 5 (RAWv2) raw bytes:
 
 ```go
-import "github.com/marcgeld/ruuvi/tag"
+import "github.com/marcgeld/hermod/tag"
 
 temp := 24.3
 hum := 53.49
@@ -355,12 +355,12 @@ This project uses automated releases via GitHub Actions.
 
 **For Go modules**: Reference the version in your `go.mod`:
 ```go
-require github.com/marcgeld/ruuvi v0.1.0
+require github.com/marcgeld/hermod v0.1.0
 ```
 
 **For CLI users**: Download pre-built binaries from the [releases page](https://github.com/marcgeld/ruuvi/releases) or install via:
 ```bash
-go install github.com/marcgeld/ruuvi/cmd/ruuvi@v0.1.0
+go install github.com/marcgeld/hermod/cmd/ruuvi@v0.1.0
 ```
 
 ## References
