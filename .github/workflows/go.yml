@@ -37,6 +37,7 @@ jobs:
       run: go build -v ./...
 
     - name: Run tests
+      shell: bash
       run: go test -v -race -coverprofile=coverage.txt -covermode=atomic ./...
 
     - name: Upload coverage to Codecov
@@ -83,9 +84,15 @@ jobs:
 
     - name: Check for changes
       run: |
-        if ! git diff --exit-code go.mod go.sum; then
-          echo "go.mod or go.sum is not tidy. Please run 'go mod tidy' and commit the changes."
+        git diff --exit-code go.mod || {
+          echo "go.mod is not tidy. Please run 'go mod tidy' and commit the changes."
           exit 1
+        }
+        if [ -f go.sum ]; then
+          git diff --exit-code go.sum || {
+            echo "go.sum is not tidy. Please run 'go mod tidy' and commit the changes."
+            exit 1
+          }
         fi
 
   examples:
