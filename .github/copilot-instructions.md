@@ -15,7 +15,7 @@ This repository provides idiomatic Go packages for working with RuuviTag Bluetoo
 ## Code Style and Conventions
 
 ### Go Standards
-- Use Go 1.21+ features and idioms
+- Use Go 1.25+ features and idioms
 - Follow standard Go formatting (use `gofmt` and `goimports`)
 - Use `golangci-lint` with the configuration in `.golangci.yml`
 - Keep imports organized with local packages prefixed by `github.com/marcgeld/ruuvi`
@@ -162,7 +162,7 @@ Always set fields to nil when invalid values are encountered.
 ## CI/CD
 
 The repository uses GitHub Actions for CI:
-- **Test**: Runs on Go 1.21, 1.22, 1.23 with race detection
+- **Test**: Runs on Go 1.25 with race detection
 - **Lint**: Uses golangci-lint with strict configuration
 - **Examples**: Builds example applications
 - Exclude examples from linting (see `.golangci.yml`)
