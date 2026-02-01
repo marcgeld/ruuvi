@@ -11,6 +11,7 @@
 # Built CLI binaries
 /cmd/ruuvi/ruuvi
 /ruuvi
+/examples/basic/basic
 
 # Build artifacts and release binaries
 dist/
