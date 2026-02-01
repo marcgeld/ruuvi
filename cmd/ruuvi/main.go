@@ -21,6 +21,7 @@ func main() {
 		fmt.Fprintf(os.Stderr, "Error: %v\n", err)
 		os.Exit(exitError)
 	}
+	os.Exit(exitSuccess)
 }
 
 func run() error {
