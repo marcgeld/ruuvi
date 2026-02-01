@@ -12,7 +12,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
-        go-version: ['1.25', '1.25', '1.25']
+        go-version: ['1.24', '1.24', '1.24']
     runs-on: ${{ matrix.os }}
 
     steps:
@@ -40,7 +40,7 @@ jobs:
       run: go test -v -race -coverprofile=coverage.txt -covermode=atomic ./...
 
     - name: Upload coverage to Codecov
-      if: matrix.os == 'ubuntu-latest' && matrix.go-version == '1.25'
+      if: matrix.os == 'ubuntu-latest' && matrix.go-version == '1.24'
       uses: codecov/codecov-action@v5
       with:
         file: ./coverage.txt
@@ -57,7 +57,7 @@ jobs:
     - name: Set up Go
       uses: actions/setup-go@v6
       with:
-        go-version: '1.25'
+        go-version: '1.24'
 
     - name: golangci-lint
       uses: golangci/golangci-lint-action@v9
@@ -76,7 +76,7 @@ jobs:
     - name: Set up Go
       uses: actions/setup-go@v6
       with:
-        go-version: '1.25'
+        go-version: '1.24'
 
     - name: Run go mod tidy
       run: go mod tidy
@@ -99,7 +99,7 @@ jobs:
     - name: Set up Go
       uses: actions/setup-go@v6
       with:
-        go-version: '1.25'
+        go-version: '1.24'
 
     - name: Build examples
       run: |
@@ -117,7 +117,7 @@ jobs:
     - name: Set up Go
       uses: actions/setup-go@v6
       with:
-        go-version: '1.25'
+        go-version: '1.24'
 
     - name: Build CLI
       run: |
