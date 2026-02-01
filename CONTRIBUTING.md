@@ -86,7 +86,7 @@ golangci-lint run --timeout=5m
 Format your code:
 ```bash
 go fmt ./...
-goimports -w -local github.com/marcgeld/ruuvi .
+goimports -w -local github.com/marcgeld/hermod .
 ```
 
 ## Testing

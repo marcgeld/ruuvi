@@ -5,7 +5,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/marcgeld/ruuvi/common"
+	"github.com/marcgeld/hermod/common"
 )
 
 // TestDecodeFormat5_ValidData tests decoding with valid data from official spec.

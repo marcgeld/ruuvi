@@ -18,7 +18,7 @@ This repository provides idiomatic Go packages for working with RuuviTag Bluetoo
 - Use Go 1.25+ features and idioms
 - Follow standard Go formatting (use `gofmt` and `goimports`)
 - Use `golangci-lint` with the configuration in `.golangci.yml`
-- Keep imports organized with local packages prefixed by `github.com/marcgeld/ruuvi`
+- Keep imports organized with local packages prefixed by `github.com/marcgeld/hermod`
 
 ### Package Organization
 ```

@@ -33,7 +33,7 @@ tidy:
 fmt:
 	go fmt ./...
 	@command -v goimports >/dev/null 2>&1 || { echo "goimports not found. Install with: go install golang.org/x/tools/cmd/goimports@latest"; exit 1; }
-	goimports -w -local github.com/marcgeld/ruuvi .
+	goimports -w -local github.com/marcgeld/hermod .
 
 # Run go vet
 vet:

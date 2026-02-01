@@ -8,7 +8,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/marcgeld/ruuvi/tag"
+	"github.com/marcgeld/hermod/tag"
 )
 
 const (
