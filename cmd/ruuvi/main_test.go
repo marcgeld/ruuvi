@@ -2,10 +2,14 @@ package main
 
 import (
 	"bytes"
+	"encoding/hex"
+	"encoding/json"
 	"io"
 	"os"
 	"strings"
 	"testing"
+
+	"github.com/marcgeld/ruuvi/tag"
 )
 
 // captureStdoutStderr captures stdout and stderr produced by fn and returns them.
@@ -128,4 +132,124 @@ func TestHandleEncode_InvalidJSON_ReturnsError(t *testing.T) {
 			t.Fatalf("expected failed to parse JSON error, got: %v", err)
 		}
 	})
+}
+
+func TestHandleDecode_ValidFormat5(t *testing.T) {
+	// Create a Format5Data and encode to bytes
+	temp := 24.3
+	hum := 50.0
+	press := 101325
+	mac := tag.Format5Data{Temperature: &temp, Humidity: &hum, Pressure: &press}
+	b, err := tag.EncodeFormat5(&mac)
+	if err != nil {
+		t.Fatalf("failed to encode format5 test vector: %v", err)
+	}
+	hexStr := hex.EncodeToString(b)
+
+	out, _ := captureStdoutStderr(func() {
+		err := handleDecode(hexStr)
+		if err != nil {
+			t.Fatalf("handleDecode returned error: %v", err)
+		}
+	})
+
+	if !strings.Contains(out, "\"Format\": 5") {
+		t.Fatalf("expected decoded output to contain Format 5, got: %s", out)
+	}
+}
+
+func TestHandleEncode_ValidFormat5(t *testing.T) {
+	// Prepare JSON for a simple Format5Data
+	temp := 21.0
+	press := 100000
+	data := tag.Format5Data{Temperature: &temp, Pressure: &press}
+	j, err := json.Marshal(data)
+	if err != nil {
+		t.Fatalf("failed to marshal JSON test data: %v", err)
+	}
+
+	expectedBytes, err := tag.EncodeFormat5(&data)
+	if err != nil {
+		t.Fatalf("failed to encode expected bytes: %v", err)
+	}
+	expectedHex := hex.EncodeToString(expectedBytes)
+
+	out, _ := captureStdoutStderr(func() {
+		err := handleEncode(string(j))
+		if err != nil {
+			t.Fatalf("handleEncode returned error: %v", err)
+		}
+	})
+
+	out = strings.TrimSpace(out)
+	if out != expectedHex {
+		t.Fatalf("handleEncode output = %q; want %q", out, expectedHex)
+	}
+}
+
+func TestRun_Decode_Success(t *testing.T) {
+	oldArgs := os.Args
+	defer func() { os.Args = oldArgs }()
+
+	// Build a valid format5 payload
+	temp := 19.5
+	data := tag.Format5Data{Temperature: &temp}
+	b, err := tag.EncodeFormat5(&data)
+	if err != nil {
+		t.Fatalf("failed to encode format5: %v", err)
+	}
+	hexStr := hex.EncodeToString(b)
+
+	os.Args = []string{"ruuvi", "decode", "--hex", hexStr}
+
+	out, stderr := captureStdoutStderr(func() {
+		err := run()
+		if err != nil {
+			t.Fatalf("run() returned error: %v", err)
+		}
+	})
+
+	if !strings.Contains(out, "\"Format\": 5") {
+		t.Fatalf("expected decoded output to contain Format 5, got: %s", out)
+	}
+	if stderr != "" {
+		t.Fatalf("expected no stderr on successful run, got: %s", stderr)
+	}
+}
+
+func TestRun_Encode_Success(t *testing.T) {
+	oldArgs := os.Args
+	defer func() { os.Args = oldArgs }()
+
+	// Prepare JSON for encode
+	temp := 22.0
+	press := 100500
+	f := tag.Format5Data{Temperature: &temp, Pressure: &press}
+	j, err := json.Marshal(f)
+	if err != nil {
+		t.Fatalf("failed to marshal json: %v", err)
+	}
+
+	os.Args = []string{"ruuvi", "encode", "--json", string(j)}
+
+	out, stderr := captureStdoutStderr(func() {
+		err := run()
+		if err != nil {
+			t.Fatalf("run() returned error: %v", err)
+		}
+	})
+
+	out = strings.TrimSpace(out)
+	// Verify the output is valid hex of the expected encoded bytes
+	expected, err := tag.EncodeFormat5(&f)
+	if err != nil {
+		t.Fatalf("EncodeFormat5 error: %v", err)
+	}
+	expectedHex := hex.EncodeToString(expected)
+	if out != expectedHex {
+		t.Fatalf("run encode output = %q; want %q", out, expectedHex)
+	}
+	if stderr != "" {
+		t.Fatalf("expected no stderr on successful run, got: %s", stderr)
+	}
 }
