@@ -12,6 +12,9 @@
 /cmd/ruuvi/ruuvi
 /ruuvi
 
+# Example binaries
+/examples/basic/basic
+
 # Build artifacts and release binaries
 dist/
 
