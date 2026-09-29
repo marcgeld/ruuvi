@@ -7,7 +7,7 @@ import (
 	"fmt"
 	"math"
 
-	"github.com/marcgeld/ruuvi/common"
+	"github.com/marcgeld/hermod/common"
 )
 
 // Format5Data represents decoded RuuviTag Data Format 5 (RAWv2) sensor data.

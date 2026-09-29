@@ -9,7 +9,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/marcgeld/ruuvi/tag"
+	"github.com/marcgeld/hermod/tag"
 )
 
 // captureStdoutStderr captures stdout and stderr produced by fn and returns them.
